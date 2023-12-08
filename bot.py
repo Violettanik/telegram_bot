@@ -2,7 +2,7 @@ from aiogram import Bot, Dispatcher, executor, types
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from aiogram.contrib.fsm_storage.memory import MemoryStorage  
-bot =Bot('6319667368:AAGSv3Ubta2VSXzl_x-jA4rReyizf4S249g')
+bot = Bot('6319667368:AAGSv3Ubta2VSXzl_x-jA4rReyizf4S249g')
 dp = Dispatcher(bot, storage=MemoryStorage())   
 from sql import SQL   
 from googleSheet import GoogleSheet 
@@ -360,6 +360,7 @@ async def gettingOperation(call):
         if gs.getData(spreadsheetId,"Лист номер один!B"+str(numberOfRows)).get('values',[])[0][0]!=date:
             await call.message.answer('Сегодня вы не вносили никаких данных о новых доходах/расходах')
         else:
+            await call.message.answer('Отчёт за сегодня')
             categories=gs.getData(spreadsheetId,"Лист номер один!C1:"+"ABCDEFGHIJKLMNOPQRSTUVYXYZ"[numberOfColumns]+"2").get('values',[])
             summs=gs.getData(spreadsheetId,"Лист номер один!C"+str(numberOfRows)+":"+"ABCDEFGHIJKLMNOPQRSTUVYXYZ"[numberOfColumns]+str(numberOfRows)).get('values',[])[0]
             for i in range(len(summs)):
@@ -399,6 +400,7 @@ async def gettingOperation(call):
                             sumOfMinus+=int(summs[j])
                 await call.message.answer(dateWithСategoriesWithSum+"\n\n"+"Сумма доходов: "+str(sumOfPlus)+"\n"+"Сумма расходов: "+str(sumOfMinus)+"\n\n"+"Общеее изменение баланса: "+str(sumOfPlus-sumOfMinus))
         else:
+            await call.message.answer('Отчёт за последние внесённые 3 дня')
             result=gs.getData(spreadsheetId,"Лист номер один!B"+str(numberOfRows-2)+":"+"ABCDEFGHIJKLMNOPQRSTUVYXYZ"[numberOfColumns]+f"{numberOfRows}").get('values',[])
             for i in range(3):
                 dateWithСategoriesWithSum=result[i][0]
@@ -421,6 +423,7 @@ async def gettingOperation(call):
         sql.changeInfForBot(str(call.from_user.id),4,str(idOfMesToDel))
         await Form.afterOper.set()
     elif call.data=='месяц':
+        await call.message.answer('Отчёт за этот месяц')
         month=call.message.date.strftime("%d.%m.%Y").split(".")[1]
         numberOfRows=int(int(sql.getInfForBot(str(call.from_user.id),0)))-1
         numberOfColumns=int(int(sql.getInfForBot(str(call.from_user.id),1)))-1
