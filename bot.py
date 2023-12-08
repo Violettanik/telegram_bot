@@ -29,7 +29,7 @@ class Form(StatesGroup):
     askSumm=State()
     getSumm=State()
 sql=SQL('My_money.sql','users')
-gs=GoogleSheet('creds_4.json')
+gs=GoogleSheet('creds.json')
 @dp.message_handler(commands=['start'])
 async def start(message:types.Message):
     columns='id varchar(50), pass varchar(50), link varchar(150), infForBot varchar(150), link2 varchar(150)'
@@ -354,23 +354,23 @@ async def gettingOperation(call):
         date=call.message.date.strftime("%d.%m.%Y")
         numberOfRows=int(int(sql.getInfForBot(str(call.from_user.id),0)))-1
         numberOfColumns=int(int(sql.getInfForBot(str(call.from_user.id),1)))-1
-        dateWithСategoriesWithSum=str(date)
+        СategoriesWithSum=""
         sumOfPlus=0
         sumOfMinus=0
         if gs.getData(spreadsheetId,"Лист номер один!B"+str(numberOfRows)).get('values',[])[0][0]!=date:
             await call.message.answer('Сегодня вы не вносили никаких данных о новых доходах/расходах')
         else:
-            await call.message.answer('Отчёт за сегодня')
             categories=gs.getData(spreadsheetId,"Лист номер один!C1:"+"ABCDEFGHIJKLMNOPQRSTUVYXYZ"[numberOfColumns]+"2").get('values',[])
             summs=gs.getData(spreadsheetId,"Лист номер один!C"+str(numberOfRows)+":"+"ABCDEFGHIJKLMNOPQRSTUVYXYZ"[numberOfColumns]+str(numberOfRows)).get('values',[])[0]
             for i in range(len(summs)):
                 if summs[i]!="":
-                    dateWithСategoriesWithSum+="\n"+categories[1][i]+" ("+categories[0][i]+"): "+summs[i]
+                    СategoriesWithSum+="\n"+categories[1][i]+" ("+categories[0][i]+"): "+summs[i]
                     if categories[0][i]=="Доход":
                         sumOfPlus+=int(summs[i])
                     else:
                         sumOfMinus+=int(summs[i])
-            await call.message.answer(dateWithСategoriesWithSum+"\n\n"+"Сумма доходов: "+str(sumOfPlus)+"\n"+"Сумма расходов: "+str(sumOfMinus)+"\n\n"+"Общеее изменение баланса: "+str(sumOfPlus-sumOfMinus))
+            await call.message.answer('Отчёт за '+date)
+            await call.message.answer(СategoriesWithSum+"\n"+"Сумма доходов: "+str(sumOfPlus)+"\n"+"Сумма расходов: "+str(sumOfMinus)+"\n\n"+"Общеее изменение баланса: "+str(sumOfPlus-sumOfMinus))
         markup=types.InlineKeyboardMarkup()
         markup.add(types.InlineKeyboardButton('Общие операции', callback_data='операции'))
         msFromBot=await call.message.answer('Вы можете вернуться к общим операциям',reply_markup=markup)
@@ -423,14 +423,13 @@ async def gettingOperation(call):
         sql.changeInfForBot(str(call.from_user.id),4,str(idOfMesToDel))
         await Form.afterOper.set()
     elif call.data=='месяц':
-        await call.message.answer('Отчёт за этот месяц')
         month=call.message.date.strftime("%d.%m.%Y").split(".")[1]
         numberOfRows=int(int(sql.getInfForBot(str(call.from_user.id),0)))-1
         numberOfColumns=int(int(sql.getInfForBot(str(call.from_user.id),1)))-1
         summOfEachCategory=[0]*(numberOfColumns-2) 
         sumOfPlus=0
         sumOfMinus=0
-        answer=f"Доходы/расходы за {month} месяц\n"
+        answer=""
         if numberOfRows<33:
             result=gs.getData(spreadsheetId,"Лист номер один!B1:"+"ABCDEFGHIJKLMNOPQRSTUVYXYZ"[numberOfColumns]+f"{numberOfRows}").get('values',[])
             categories=result[:2]
@@ -463,9 +462,10 @@ async def gettingOperation(call):
             for i in range(len(summOfEachCategory)):
                 if summOfEachCategory[i]!=0:
                     answer+=categories[1][i]+" ("+categories[0][i]+"): "+str(summOfEachCategory[i])+"\n"
-        if answer==f"Доходы/расходы за {month} месяц\n":
+        if answer=="":
             await call.message.answer('Отсутствуют какие либо данные о новых доходах/расходах в этом месяце')
         else:
+            await call.message.answer(f'Доходы/расходы за {month} месяц')
             await call.message.answer(answer+"\n"+"Сумма доходов: "+str(sumOfPlus)+"\n"+"Сумма расходов: "+str(sumOfMinus)+"\n\n"+"Общеее изменение баланса: "+str(sumOfPlus-sumOfMinus))
         markup=types.InlineKeyboardMarkup()
         markup.add(types.InlineKeyboardButton('Общие операции', callback_data='операции'))

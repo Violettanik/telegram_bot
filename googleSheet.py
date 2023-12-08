@@ -13,7 +13,7 @@ class GoogleSheet:
         """
         name of file with creds-information
         """
-        self.credentials = self.ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive'])
+        self.credentials = self.ServiceAccountCredentials.from_json_keyfile_name(self.CREDENTIALS_FILE, ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive'])
         """
         credentials
         """

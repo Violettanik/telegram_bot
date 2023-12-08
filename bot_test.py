@@ -10,7 +10,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from googleSheet import GoogleSheet 
 
 sql=SQL('My_money_test.sql','users')
-gs=GoogleSheet('creds_4.json')
+gs=GoogleSheet('creds.json')
 
 conn=sqlite3.connect('My_money_test.sql')
 cur=conn.cursor()
