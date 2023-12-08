@@ -24,12 +24,12 @@ conn.commit()
 cur.close()
 conn.close()
 
-CREDENTIALS_FILE='creds_4.json'
+CREDENTIALS_FILE='creds.json'
 credentials = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive'])
 httpAuth = credentials.authorize(httplib2.Http())
 service = apiclient.discovery.build('sheets', 'v4', http = httpAuth)
 
-spreadsheetId='1sEiRzbjab1v5BZG2cTQ01teYGt7tPtb8eec-Nu8CMY4'
+spreadsheetId='1lYkeyyRKZROtAStuA0pBsyoURONmlhPeU_THH1KNEMQ'
 
 service.spreadsheets().values().batchUpdate(spreadsheetId = spreadsheetId, body = {"valueInputOption": "USER_ENTERED","data": [{"range": "Лист номер один!A1:B2","majorDimension": "ROWS","values":[['A1','B1'],['A2','B2']]}]}).execute()
 
